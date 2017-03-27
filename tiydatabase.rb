@@ -101,8 +101,8 @@ class Tiydatabase
   def report_account
     puts "The Iron Yard Database Reports: "
 
-    employees_by_position = @accounts.group_by {|account| account.position }
-    ap employees_by_position
+    employees_by_position = @accounts.group_by {|account| account.position.downcase }
+#    ap employees_by_position
 
     employees_by_position.each do |position, account|
       total_salary = account.map {|account| account.salary }.sum
