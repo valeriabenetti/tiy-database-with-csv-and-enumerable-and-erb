@@ -88,14 +88,13 @@ class Tiydatabase
     puts 'Who are you looking to terminate? '
     name_deleted = gets.chomp
 
-    delete_account = @accounts.delete_if { |account| account.name == name_deleted }
-    if delete_account
+    if @accounts.any? {|account| account.name == name_deleted}
+      @accounts.delete_if { |account| account.name == name_deleted }
       puts 'Account has been exterminated!'
       write_csv
     else
       puts 'No such account exist'
     end
-
   end
 
   def report_account
@@ -153,9 +152,7 @@ class Tiydatabase
     people_position("Campus Director").count
   end
 
-#  def employees_file
-#  return "employees.csv"
-#  end
+
 end
 data = Tiydatabase.new
 
