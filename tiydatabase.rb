@@ -1,4 +1,5 @@
 require 'csv'
+require 'awesome_print'
 class Person
   # Saving the correct data into class
   attr_reader 'name', 'phone', 'address', 'position', 'salary', 'slack', 'github'
@@ -98,16 +99,16 @@ class Tiydatabase
   end
 
   def report_account
-    sorted_accounts = @accounts.sort_by {|account| account.name }
-    sorted_accounts.each do |account|
-    end
     puts "The Iron Yard Database Reports: "
-    puts "The total salary for the Instructors is #{salary_total_for_position("Instructor")}"
-    puts "The total salary for the Campus Director is #{salary_total_for_position("Campus Director")}"
-    puts "The total number of students at the Iron Yard is #{position_count("Student")}"
-    puts "The total number of Instructor at the Iron Yard is #{position_count("Instructor")}"
-    puts "The total number of Campus Directors at the Iron Yard is #{position_count("Campus Director")}"
 
+    employees_by_position = @accounts.group_by {|account| account.position }
+    ap employees_by_position
+
+    employees_by_position.each do |position, account|
+      total_salary = account.map {|account| account.salary }.sum
+      puts "The total salary for the #{position} is #{total_salary}"
+      puts "The total count for the #{position} is #{account.count}"
+    end
   end
 
   def write_csv
