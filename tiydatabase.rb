@@ -16,10 +16,10 @@ end
 
 class Tiydatabase
   attr_reader 'accounts'
-
+  EMPLOYEE_FILE = "employees.csv"
   def initialize
     @accounts = []
-    CSV.foreach( employees_file, headers: true) do |row|
+    CSV.foreach( EMPLOYEE_FILE, headers: true) do |row|
       name = row["name"]
       phone = row["phone"]
       address = row["address"]
@@ -103,46 +103,59 @@ class Tiydatabase
     sorted_accounts.each do |account|
     end
     puts "The Iron Yard Database Reports: "
-    puts "The total salary for the Instructors is #{teacher_salary}"
-    puts "The total salary for the Campus Director is #{director_salary}"
-    puts "The total number of students at the Iron Yard is #{total_students}"
-    puts "The total number of Instructor at the Iron Yard is #{total_teachers}"
-    puts "The total number of Campus Directors at the Iron Yard is #{total_director}"
+    puts "The total salary for the Instructors is #{salary_total_for_position("Instructor")}"
+    puts "The total salary for the Campus Director is #{salary_total_for_position("Campus Director")}"
+    puts "The total number of students at the Iron Yard is #{position_count("Student")}"
+    puts "The total number of Instructor at the Iron Yard is #{position_count("Instructor")}"
+    puts "The total number of Campus Directors at the Iron Yard is #{position_count("Campus Director")}"
 
-  end
-
-  def teacher_salary
-    @accounts.select {|account| account.position.include?("Instructor") }.map { |account| account.salary }.sum
-  end
-
-  def director_salary
-    @accounts.select {|account| account.position.include?("Campus Director") }.map {|account| account.salary }.sum
-  end
-
-  def total_students
-    @accounts.select {|account| account.position.include?("Student") }.count
-  end
-
-  def total_teachers
-    @accounts.select {|account| account.position.include?("Instructor") }.count
-  end
-
-  def total_director
-    @accounts.select {|account| account.position.include?("Campus Director") }.count
-  end
-
-  def employees_file
-    return "employees.csv"
   end
 
   def write_csv
-    CSV.open(employees_file, "w") do |csv|
+    CSV.open(EMPLOYEE_FILE, "w") do |csv|
       csv << ["name", "phone", "address", "position", "salary", "slack", "github"]
       @accounts.each do |account|
         csv << [account.name, account.phone, account.address, account.position, account.salary, account.slack, account.github]
       end
     end
   end
+
+  def people_position(position)
+    @accounts.select {|account| account.position.include?(position) }
+  end
+
+  def salary_total_for_position(position)
+    people_position(position).map {|account| account.salary}.sum
+  end
+
+  def position_count(position)
+    people_position(position).count
+
+  end
+
+  def teacher_salary
+    people_position("Instructor").map { |account| account.salary }.sum
+  end
+
+  def director_salary
+    people_position("Campus Director").map {|account| account.salary }.sum
+  end
+
+  def total_students
+    people_position("Student").count
+  end
+
+  def total_teachers
+    people_position("Instructor").count
+  end
+
+  def total_director
+    people_position("Campus Director").count
+  end
+
+#  def employees_file
+#  return "employees.csv"
+#  end
 end
 data = Tiydatabase.new
 
