@@ -1,5 +1,6 @@
 require 'csv'
-require 'awesome_print'
+require 'erb'
+
 class Person
   # Saving the correct data into class
   attr_reader 'name', 'phone', 'address', 'position', 'salary', 'slack', 'github'
@@ -99,24 +100,14 @@ class Tiydatabase
   end
 
   def report_account
+
     puts "The Iron Yard Database Reports: "
 
     employees_by_position = @accounts.group_by {|account| account.position.downcase }
-#    ap employees_by_position
-
     employees_by_position.each do |position, account|
       total_salary = account.map {|account| account.salary }.sum
       puts "The total salary for the #{position} is #{total_salary}"
       puts "The total count for the #{position} is #{account.count}"
-    end
-  end
-
-  def write_csv
-    CSV.open(EMPLOYEE_FILE, "w") do |csv|
-      csv << ["name", "phone", "address", "position", "salary", "slack", "github"]
-      @accounts.each do |account|
-        csv << [account.name, account.phone, account.address, account.position, account.salary, account.slack, account.github]
-      end
     end
   end
 
@@ -153,12 +144,25 @@ class Tiydatabase
     people_position("Campus Director").count
   end
 
+  def write_csv
+    CSV.open(EMPLOYEE_FILE, "w") do |csv|
+      csv << ["name", "phone", "address", "position", "salary", "slack", "github"]
+      @accounts.each do |account|
+        csv << [account.name, account.phone, account.address, account.position, account.salary, account.slack, account.github]
+      end
+    end
+  end
 
+  def html_employee_report
+    template = ERB.new(File.read("report.html.erb"))
+    html = template.result(binding)
+    File.write("report.html", html)
+  end
 end
 data = Tiydatabase.new
 
 loop do
-  puts 'Would you like to Add (A), Search (S) or Delete (D) a person or view the Report (R) from the Iron Yard Database?'
+  puts 'Would you like to Add (A), Search (S) or Delete (D) a person or view the Report (R) or Print (P) from the Iron Yard Database?'
   selected = gets.chomp.upcase
 
   data.add_person if selected == 'A'
@@ -168,8 +172,6 @@ loop do
   data.delete_person if selected == 'D'
 
   data.report_account if selected == 'R'
+
+  data.html_employee_report if selected == 'P'
 end
-# If csv info got deleted, comment is at the bottom
-# Gavin,555-1212,1 Main Street,Instructor,1000000,gstark,gstark
-# Jason,555-4242,500 Elm Street,Instructor,2000000,ambethia,ambethia
-# Toni,555-4444,200 Pine Street,Campus Director,3000000,amazing_toni,amazing_toni
